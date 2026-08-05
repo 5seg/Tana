@@ -24,7 +24,11 @@ new Elysia()
     }
   })
   .get("/", () => "Tana is working!")
-  .get("/articles", async () => await getArticlesList())
+  .get("/articles", async ({query}) => {
+    const limit = Number(query.limit ?? 10);
+    const offset = Number(query.offset ?? 0);
+    return await getArticlesList(limit,offset);
+  })
   .get("/articles/:slug", async ({ params }) => {
     const article = await getArticle(params.slug);
     if (!article) throw new NotFoundError("Article Not Found");

@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { join } from "node:path";
 import { parseArticle, type Article } from "./articleParser";
 
-export const getArticlesList = async () => {
+export const getArticlesList = async (limit: number, offset:number) => {
   const articlesDir = join(__dirname, "../content/articles");
   const files = (await fs.readdir(articlesDir)).filter((a) =>
     a.endsWith(".md"),
