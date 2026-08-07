@@ -8,8 +8,9 @@ export const getArticlesList = async (limit: number, offset: number) => {
   const files = (await fs.readdir(articlesDir)).filter((a) =>
     a.endsWith(".md"),
   );
-  let articles: (Omit<Article, "body" | "description" | "createdAt"> & {
+  let articles: (Omit<Article, "body" | "description" | "createdAt" | "updatedAt"> & {
     createdAt: Date;
+    updatedAt?: Date;
   })[] = [];
   for (const file of files) {
     try {
@@ -19,6 +20,7 @@ export const getArticlesList = async (limit: number, offset: number) => {
         slug: parsed.slug,
         published: parsed.published,
         createdAt: new Date(parsed.createdAt),
+        updatedAt: parsed.updatedAt ? new Date(parsed.updatedAt) : undefined,
         tags: parsed.tags,
       });
     } catch {}

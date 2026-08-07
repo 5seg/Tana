@@ -9,6 +9,7 @@ slug: ${slug}
 description: ""
 published: false
 createdAt: ${new Date().toISOString().split("T")[0]}
+updatedAt: ${new Date().toISOString().split("T")[0]}
 tags: []
 ---
 

@@ -6,6 +6,7 @@ export type Article = {
   description: string;
   published: boolean;
   createdAt: string;
+  updatedAt?: string;
   tags: string[];
   body: string;
 };
@@ -31,7 +32,8 @@ const validate = (
   fields: Record<string, unknown>,
   fileName: string,
 ): Omit<Article, "body"> => {
-  const { title, slug, description, published, createdAt, tags } = fields;
+  const { title, slug, description, published, createdAt, updatedAt, tags } =
+    fields;
 
   if (typeof title !== "string" || !title)
     throw new Error(`Missing or invalid 'title' in ${fileName}`);
@@ -43,10 +45,23 @@ const validate = (
     throw new Error(`Missing or invalid 'published' in ${fileName}`);
   if (typeof createdAt !== "string" || isNaN(Date.parse(createdAt)))
     throw new Error(`Invalid 'createdAt' in ${fileName}`);
+  if (
+    updatedAt !== undefined &&
+    (typeof updatedAt !== "string" || isNaN(Date.parse(updatedAt)))
+  )
+    throw new Error(`Invalid 'updatedAt' in ${fileName}`);
   if (!Array.isArray(tags) || !tags.every((t) => typeof t === "string"))
     throw new Error(`Invalid 'tags' in ${fileName}`);
 
-  return { title, slug, description, published, createdAt, tags };
+  return {
+    title,
+    slug,
+    description,
+    published,
+    createdAt,
+    updatedAt,
+    tags,
+  };
 };
 
 export const parseArticle = async (fileName: string): Promise<Article> => {
