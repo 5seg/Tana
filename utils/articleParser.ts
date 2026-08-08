@@ -39,6 +39,10 @@ const validate = (
     throw new Error(`Missing or invalid 'title' in ${fileName}`);
   if (typeof slug !== "string" || !slug)
     throw new Error(`Missing or invalid 'slug' in ${fileName}`);
+  if (slug !== fileName.slice(0, -3))
+    throw new Error(
+      `'slug' (${slug}) does not match file name in ${fileName}`,
+    );
   if (typeof description !== "string")
     throw new Error(`Missing or invalid 'description' in ${fileName}`);
   if (typeof published !== "boolean")
