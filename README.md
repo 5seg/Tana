@@ -9,6 +9,28 @@ Tana はシンプルな Headless CMS です。<br>
 - 余計なものなし - ダッシュボードはありません。記事を編集したいなら、`bun run newArticle.ts foo && vim content/articles/foo.md`を実行してください。
 - 使いやすい - シンプルなおかげで、覚えることも圧倒的に少ないです。
 
+## 始め方
+
+### 初期設定
+
+以下の手順に従ってください:
+
+1. このリポジトリをclone
+2. `bun i`で依存関係をインストール
+3. `bun run init.ts`で初期化
+
+### 起動
+
+`bun run index.ts`で起動します。
+
+### 執筆
+
+`bun run newArticle.ts`を実行すると、`content/articles`以下にMarkdownファイルが生成されます。このとき、引数として名前を指定できます。未指定の場合は自動で命名されます。
+
+例: `bun run newArticle.ts foo` → `content/articles/foo.md`が生成されます。
+
+生成後、お好きなエディタで執筆を行ってください。ファイルの変更は監視されているため、サーバーの再起動は不要です。
+
 ## API
 
 ### `GET /`
