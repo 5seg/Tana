@@ -27,3 +27,7 @@ Tana はシンプルな Headless CMS です。<br>
 ### `GET /articles/:slug`
 
 特定の記事の内容を返却します。
+
+## ライセンス
+
+MIT
