@@ -32,7 +32,14 @@ export const getArticlesList = async (limit: number, offset: number) => {
     }
   }
   articles.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  return articles.slice(offset, offset + limit);
+  const len = articles.length;
+  const sliced = articles.slice(offset, offset + limit);
+  return {
+    data: sliced,
+    meta: {
+      total: len,
+    },
+  };
 };
 
 export const getArticle = async (fileName: string) => {
