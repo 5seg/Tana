@@ -8,7 +8,10 @@ export const getArticlesList = async (limit: number, offset: number) => {
   const files = (await fs.readdir(articlesDir)).filter((a) =>
     a.endsWith(".md"),
   );
-  let articles: (Omit<Article, "body" | "description" | "createdAt" | "updatedAt"> & {
+  let articles: (Omit<
+    Article,
+    "body" | "description" | "createdAt" | "updatedAt"
+  > & {
     createdAt: Date;
     updatedAt?: Date;
   })[] = [];
@@ -23,7 +26,9 @@ export const getArticlesList = async (limit: number, offset: number) => {
         updatedAt: parsed.updatedAt ? new Date(parsed.updatedAt) : undefined,
         tags: parsed.tags,
       });
-    } catch {}
+    } catch (e) {
+      logger.error(e);
+    }
   }
   return articles.slice(offset, offset + limit);
 };
