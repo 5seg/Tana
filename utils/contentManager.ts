@@ -10,7 +10,7 @@ export const getArticlesList = async (limit: number, offset: number) => {
   );
   let articles: (Omit<
     Article,
-    "body" | "description" | "createdAt" | "updatedAt"
+    "body" | "description" | "createdAt" | "updatedAt" | "published"
   > & {
     createdAt: Date;
     updatedAt?: Date;
@@ -18,18 +18,20 @@ export const getArticlesList = async (limit: number, offset: number) => {
   for (const file of files) {
     try {
       const parsed = await parseArticle(file);
-      articles.push({
-        title: parsed.title,
-        slug: parsed.slug,
-        published: parsed.published,
-        createdAt: new Date(parsed.createdAt),
-        updatedAt: parsed.updatedAt ? new Date(parsed.updatedAt) : undefined,
-        tags: parsed.tags,
-      });
+      if (parsed.published) {
+        articles.push({
+          title: parsed.title,
+          slug: parsed.slug,
+          createdAt: new Date(parsed.createdAt),
+          updatedAt: parsed.updatedAt ? new Date(parsed.updatedAt) : undefined,
+          tags: parsed.tags,
+        });
+      }
     } catch (e) {
       logger.error(e);
     }
   }
+  articles.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   return articles.slice(offset, offset + limit);
 };
 
