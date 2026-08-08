@@ -18,6 +18,12 @@ watchContent(join(__dirname, "content/articles"), async (ev) => {
 });
 
 new Elysia()
+  .onRequest(({ request }) => {
+    console.log(`→ ${request.method} ${request.url}`);
+  })
+  .onAfterResponse(({ request, set }) => {
+    console.log(`← ${request.method} ${request.url} [${set.status}]`);
+  })
   .onError(({ code, status, set, error }) => {
     if (code === "NOT_FOUND") {
       return status(404, { error: error.message ?? "Not Found" });
