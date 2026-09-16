@@ -1,54 +1,53 @@
-# 📕 Tana - CMS for minimalist
+# 📕 Tana v2 - CMS for minimalist (Cloudflare Workers + D1 + KV)
 
-Tana はシンプルな Headless CMS です。<br>
-余計な機能を搭載せず、ただ記事を配信することにのみ特化させています。
+Tana はミニマリスト向けの超軽量 Headless CMS です。
+v2 では Cloudflare Workers + D1 + KV のエッジスタックに移行し、シンプルさを極限まで維持したまま高速・グローバル配信に対応しました。
 
 ## 特徴
 
-- 軽量 - BunがあればOK。`package.json`を見たとき、依存パッケージの少なさに驚くでしょう。
-- 余計なものなし - ダッシュボードはありません。記事を編集したいなら、`bun run newArticle.ts foo && vim content/articles/foo.md`を実行してください。
-- 使いやすい - シンプルなおかげで、覚えることも圧倒的に少ないです。
+- **超軽量・ミニマル**: Hono ベースで構成。ファイルもコードも数個のみ。
+- **D1 + KV アーキテクチャ**: D1 を記事・メタデータの保管庫、KV を一覧・個別記事の高速キャッシュ層として利用。
+- **シンプルなキャッシュ管理**: 記事の作成・更新・削除時に KV キャッシュを自動パージ。
+- **Bearer 認証付き CRUD API**: 余計なダッシュボードを作らず、シンプルな REST API で記事を管理。
 
-## 始め方
+## 構成
 
-### 初期設定
-
-以下の手順に従ってください:
-
-1. このリポジトリをclone
-2. `bun i`で依存関係をインストール
-3. `bun run init.ts`で初期化
-
-### 起動
-
-`bun run index.ts`で起動します。
-
-### 執筆
-
-`bun run newArticle.ts`を実行すると、`content/articles`以下にMarkdownファイルが生成されます。このとき、引数として名前を指定できます。未指定の場合は自動で命名されます。
-
-例: `bun run newArticle.ts foo` → `content/articles/foo.md`が生成されます。
-
-生成後、お好きなエディタで執筆を行ってください。ファイルの変更は監視されているため、サーバーの再起動は不要です。
+- `src/index.ts`: Hono エントリーポイント & API エンドポイント
+- `src/types.ts`: 型定義 (Article, D1Row, Bindings)
+- `schema.sql`: D1 データベーススキーマ
+- `wrangler.jsonc`: Cloudflare 設定 (D1/KV バインディング)
 
 ## API
 
-### `GET /`
+### 閲覧用 API (Public / KV Cache)
+- `GET /`: ヘルスチェック (`Tana is working!`)
+- `GET /articles?limit=10&offset=0`: 公開記事一覧
+- `GET /articles/:slug`: 記事詳細
 
-動作確認用。`Tana is working!`を返却します。
+### 管理用 API (`Authorization: Bearer <API_TOKEN>`)
+- `POST /api/articles`: 記事作成
+- `PUT /api/articles/:slug`: 記事更新
+- `DELETE /api/articles/:slug`: 記事削除
 
-### `GET /articles`
+## 始め方
 
-記事一覧を返却します。以下のクエリパラメータが使えます:
+### 1. D1 データベース初期化
+```bash
+# ローカル
+bun run d1:init:local
 
-- `limit` - 最大件数を指定します。デフォルトは`10`です。
-- `offset` - オフセットを指定します。デフォルトは`0`です。
+# リモート (Cloudflare)
+bun run d1:init:remote
+```
 
-`limit`と`offset`の組み合わせにより、ページネーションの実装が可能となります。([例](https://github.com/5seg/website-v2/blob/054e78c9467c5edad71a64dad8a1e2ca60f38b00/src/components/Articles.tsx))
+### 2. 起動 / デプロイ
+```bash
+# 開発サーバー
+bun run dev
 
-### `GET /articles/:slug`
-
-特定の記事の内容を返却します。
+# Cloudflare Workers へデプロイ
+bun run deploy
+```
 
 ## ライセンス
 
