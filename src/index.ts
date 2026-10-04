@@ -1,7 +1,17 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import type { Env, Article, ArticleRow } from "./types";
 
 const app = new Hono<{ Bindings: Env }>();
+
+app.use(
+  "*",
+  cors({
+    origin: ["https://tana-web.5seg.top"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Row -> Article 変換
 const formatArticle = (row: ArticleRow): Article => ({
@@ -95,6 +105,56 @@ app.use("/api/*", async (c, next) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
   return next();
+});
+
+// 記事一覧 (管理用)
+app.get("/api/articles", async (c) => {
+  const limit = Math.max(1, Number(c.req.query("limit") ?? 10));
+  const offset = Math.max(0, Number(c.req.query("offset") ?? 0));
+
+  const { results: rows } = await c.env.DB.prepare(
+    "SELECT slug, title, description, published, tags, created_at, updated_at FROM articles ORDER BY created_at DESC LIMIT ? OFFSET ?"
+  )
+    .bind(limit, offset)
+    .all<ArticleRow>();
+
+  const countRes = await c.env.DB.prepare(
+    "SELECT COUNT(*) as count FROM articles"
+  ).first<{ count: number }>();
+
+  const data = rows.map((r) => {
+    const a = formatArticle(r);
+    return {
+      title: a.title,
+      slug: a.slug,
+      description: a.description,
+      published: a.published,
+      tags: a.tags,
+      createdAt: a.createdAt,
+      updatedAt: a.updatedAt,
+    };
+  });
+
+  return c.json({
+    data,
+    meta: { total: countRes?.count ?? 0 },
+  });
+});
+
+// 記事詳細 (管理用)
+app.get("/api/articles/:slug", async (c) => {
+  const slug = c.req.param("slug");
+
+  const row = await c.env.DB.prepare(
+    "SELECT * FROM articles WHERE slug = ?"
+  )
+    .bind(slug)
+    .first<ArticleRow>();
+
+  if (!row) return c.json({ error: "Article Not Found" }, 404);
+
+  const article = formatArticle(row);
+  return c.json(article);
 });
 
 // 記事作成

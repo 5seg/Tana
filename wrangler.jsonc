@@ -4,20 +4,25 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-16",
   "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [
+    {
+      "pattern": "cms.5seg.top",
+      "custom_domain": true
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "tana-db",
-      "database_id": "local-tana-db"
+      "database_id": "ec86085e-f18a-4a8b-9c4a-7f002fb792dd"
     }
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "local-tana-kv"
+      "id": "bbae7b8540254c6f8586331acd9b5384"
     }
-  ],
-  "vars": {
-    "API_TOKEN": "tana-secret-token"
-  }
+  ]
 }

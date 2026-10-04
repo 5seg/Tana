@@ -28,6 +28,8 @@ v2 では Cloudflare Workers + D1 + KV のエッジスタックに移行し、�
 - `POST /api/articles`: 記事作成
 - `PUT /api/articles/:slug`: 記事更新
 - `DELETE /api/articles/:slug`: 記事削除
+- `GET /api/articles?limit=10&offset=0`: 記事一覧
+- `GET /api/articles/:slug`: 記事詳細
 
 ## 始め方
 
@@ -40,7 +42,16 @@ bun run d1:init:local
 bun run d1:init:remote
 ```
 
-### 2. 起動 / デプロイ
+### 2. API トークン設定
+```bash
+# ローカル (wrangler dev 用、git 管理外)
+echo 'API_TOKEN=<token>' > .dev.vars
+
+# リモート (Cloudflare Secret)
+bunx wrangler secret put API_TOKEN
+```
+
+### 3. 起動 / デプロイ
 ```bash
 # 開発サーバー
 bun run dev

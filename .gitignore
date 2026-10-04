@@ -35,3 +35,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 #content dir
 content
+# wrangler
+.wrangler
+.dev.vars
